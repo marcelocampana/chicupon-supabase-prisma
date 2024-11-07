@@ -8,7 +8,6 @@ generator client {
   provider = "prisma-client-js"
 }
 
-
 model Category {
   category_id Int      @id @default(autoincrement())
   name        String   @unique
@@ -50,9 +49,14 @@ model Business {
   @@index([status_id])
   @@index([business_admin_profile_id])
 
-  @@foreignKey([subscription_id], references: [subscription_id], onUpdate: Cascade, onDelete: SetNull)
-  @@foreignKey([status_id], references: [status_id], onUpdate: Cascade)
-  @@foreignKey([business_admin_profile_id], references: [id], onUpdate: Cascade)
+  subscription Subscription? @relation(fields: [subscription_id], references: [subscription_id], onUpdate: Cascade, onDelete: SetNull)
+  status BusinessStatus @relation(fields: [status_id], references: [status_id], onUpdate: Cascade, onDelete: SetNull)
+  adminProfile Profile @relation(fields: [business_admin_profile_id], references: [id], onUpdate: Cascade, onDelete: SetNull)
+
+  branches BusinessBranch[]
+  changes BusinessChange[]
+  comments BusinessComment[]
+  coupons Coupon[]
 }
 
 model BusinessBranch {
@@ -72,8 +76,8 @@ model BusinessBranch {
   @@index([branch_created_by])
   @@index([business_id])
 
-  @@foreignKey([branch_created_by], references: [id])
-  @@foreignKey([business_id], references: [business_id], onUpdate: Cascade, onDelete: Cascade)
+  createdBy Profile @relation(fields: [branch_created_by], references: [id], onUpdate: Cascade, onDelete: SetNull)
+  business Business? @relation(fields: [business_id], references: [business_id], onUpdate: Cascade, onDelete: Cascade)
 }
 
 model BusinessChangeComment {
@@ -85,7 +89,7 @@ model BusinessChangeComment {
 
   @@index([business_change_id])
 
-  @@foreignKey([business_change_id], references: [business_change_id], onDelete: Cascade)
+  businessChange BusinessChange @relation(fields: [business_change_id], references: [business_change_id], onDelete: Cascade)
 }
 
 model BusinessChangeStatus {
@@ -93,6 +97,8 @@ model BusinessChangeStatus {
   status_name               String
   created_at                DateTime @default(now())
   updated_at                DateTime @updatedAt
+
+  changes BusinessChange[]
 }
 
 model BusinessChange {
@@ -114,8 +120,10 @@ model BusinessChange {
   @@index([business_id])
   @@index([business_rut])
 
-  @@foreignKey([change_status_id], references: [business_change_status_id], onUpdate: Cascade)
-  @@foreignKey([business_id], references: [business_id], onDelete: Cascade)
+  changeStatus BusinessChangeStatus @relation(fields: [change_status_id], references: [business_change_status_id], onUpdate: Cascade, onDelete: SetNull)
+  business Business @relation(fields: [business_id], references: [business_id], onUpdate: Cascade, onDelete: Cascade)
+
+  comments BusinessChangeComment[]
 }
 
 model BusinessComment {
@@ -127,7 +135,7 @@ model BusinessComment {
 
   @@index([business_id])
 
-  @@foreignKey([business_id], references: [business_id], onDelete: Cascade)
+  business Business @relation(fields: [business_id], references: [business_id], onUpdate: Cascade, onDelete: Cascade)
 }
 
 model BusinessStatusLog {
@@ -139,14 +147,17 @@ model BusinessStatusLog {
   @@index([status_id])
   @@index([user_id])
 
-  @@foreignKey([status_id], references: [status_id], onUpdate: Cascade)
-  @@foreignKey([user_id], references: [id])
+  status BusinessStatus @relation(fields: [status_id], references: [status_id], onUpdate: Cascade, onDelete: SetNull)
+  user Profile @relation(fields: [user_id], references: [id], onUpdate: Cascade, onDelete: SetNull)
 }
 
 model BusinessStatus {
   status_id   Int    @id @default(autoincrement())
   status      String
   description String?
+
+  businesses Business[]
+  statusLogs BusinessStatusLog[]
 }
 
 model CouponApproveStatus {
@@ -166,7 +177,7 @@ model CouponComment {
 
   @@index([coupon_id])
 
-  @@foreignKey([coupon_id], references: [coupon_id], onUpdate: Cascade, onDelete: Cascade)
+  coupon Coupon? @relation(fields: [coupon_id], references: [coupon_id], onUpdate: Cascade, onDelete: Cascade)
 }
 
 model CouponPublicationStatus {
@@ -184,13 +195,15 @@ model CouponRedeem {
 
   @@index([coupon_id])
 
-  @@foreignKey([coupon_id], references: [coupon_id], onUpdate: Cascade, onDelete: SetNull)
+  coupon Coupon? @relation(fields: [coupon_id], references: [coupon_id], onUpdate: Cascade, onDelete: SetNull)
 }
 
 model CouponStatus {
   status_id   Int    @id @default(autoincrement())
   status      String
   description String?
+
+  coupons Coupon[]
 }
 
 model Coupon {
@@ -220,8 +233,11 @@ model Coupon {
   @@index([business_id])
   @@index([status_id])
 
-  @@foreignKey([business_id], references: [business_id], onDelete: Cascade)
-  @@foreignKey([status_id], references: [status_id], onUpdate: Cascade)
+  business Business @relation(fields: [business_id], references: [business_id], onUpdate: Cascade, onDelete: Cascade)
+  status CouponStatus @relation(fields: [status_id], references: [status_id], onUpdate: Cascade, onDelete: SetNull)
+
+  comments CouponComment[]
+  redeems CouponRedeem[]
 }
 
 model Profile {
@@ -235,7 +251,9 @@ model Profile {
   phone      String?
   terms      String  @default("No")
 
-  @@foreignKey([id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  businesses Business[]
+  branches BusinessBranch[]
+  statusLogs BusinessStatusLog[]
 }
 
 model Subscription {
@@ -247,4 +265,6 @@ model Subscription {
   discount        Float?
   is_active       Boolean  @default(true)
   plan_id         Int?
+
+  businesses Business[]
 }
