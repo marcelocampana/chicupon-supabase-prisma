@@ -241,15 +241,17 @@ model Coupon {
 }
 
 model Profile {
-  id         String @id @default(uuid())
-  firstname  String?
-  lastname   String?
-  email      String?
-  role       String?
-  birthday   String?
-  gender     String?
-  phone      String?
-  terms      String  @default("No")
+  id                    String  @id @default(uuid())
+  firstname             String?
+  lastname              String?
+  email                 String?
+  role                  String?
+  birthday              String?
+  gender                String?
+  phone                 String?
+  terms                 String  @default("No")
+  is_active             Boolean @default(true)
+  has_access_to_business Boolean @default(true) // Nuevo campo para indicar si tiene acceso a algún comercio
 
   businesses Business[]
   branches BusinessBranch[]
