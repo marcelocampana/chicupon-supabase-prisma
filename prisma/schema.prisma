@@ -29,7 +29,7 @@ model Business {
   legal_representative_firstname   String
   legal_representative_lastname    String
   legal_representative_rut         String
-  business_admin_profile_id        String   @unique
+  business_admin_profile_id        String   @unique // Mantener la relación pero con validaciones de aplicación para evitar nulos sin reasignar primero adminProfile Profile @relation(fields: [business_admin_profile_id], references: [id], onUpdate: Cascade)
   business_website                 String?
   business_facebook                String?
   business_instagram               String?
@@ -38,7 +38,7 @@ model Business {
   business_cover                   String?
   created_at                       DateTime @default(now())
   updated_at                       DateTime @updatedAt
-  subscription_id                  Int?
+  subscription_id                  Int? @unique
   status_id                        Int
   business_tiktok                  String?
   is_featured                      Boolean  @default(false)
@@ -49,7 +49,7 @@ model Business {
   @@index([status_id])
   @@index([business_admin_profile_id])
 
-  subscription Subscription? @relation(fields: [subscription_id], references: [subscription_id], onUpdate: Cascade, onDelete: SetNull)
+  subscription Subscription? @relation("CurrentSubscription", fields: [subscription_id], references: [subscription_id])
   status BusinessStatus @relation(fields: [status_id], references: [status_id], onUpdate: Cascade, onDelete: SetNull)
   adminProfile Profile @relation(fields: [business_admin_profile_id], references: [id], onUpdate: Cascade, onDelete: SetNull)
 
@@ -57,6 +57,7 @@ model Business {
   changes BusinessChange[]
   comments BusinessComment[]
   coupons Coupon[]
+  subscriptions Subscription[] @relation("AllSubscriptions")
 }
 
 model BusinessBranch {
@@ -258,6 +259,19 @@ model Profile {
   statusLogs BusinessStatusLog[]
 }
 
+model Plan {
+  plan_id                    Int      @id @default(autoincrement())
+  name                       String   @unique
+  description                String?
+  cost                       Float
+  is_active                  Boolean  @default(true) // Indica si el plan está activo en general
+  is_available_for_subscription Boolean @default(true) // Indica si el plan se puede contratar actualmente
+  created_at                 DateTime @default(now())
+  updated_at                 DateTime @updatedAt
+
+  subscriptions Subscription[]
+}
+
 model Subscription {
   subscription_id Int      @id @default(autoincrement())
   start_date      DateTime @default(now())
@@ -265,8 +279,11 @@ model Subscription {
   total_cost      Float
   tax             Float?
   discount        Float?
-  is_active       Boolean  @default(true)
-  plan_id         Int?
+  is_active       Boolean  @default(true) // Indica si la suscripción está activa
+  plan_id         Int
+  business_id     String
 
-  businesses Business[]
+  plan            Plan    @relation(fields: [plan_id], references: [plan_id], onUpdate: Cascade, onDelete: SetNull)
+  business        Business @relation("AllSubscriptions", fields: [business_id], references: [business_id], onUpdate: Cascade, onDelete: Cascade)
+  currentSubscriptionBusiness Business? @relation("CurrentSubscription")
 }
