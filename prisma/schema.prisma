@@ -203,7 +203,7 @@ model CouponStatus {
   status      String
   description String?
 
-  coupons Coupon[]
+  coupons Coupon[] // Relación inversa que apunta a los cupones asociados con este estado.
 }
 
 model Coupon {
