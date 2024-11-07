@@ -1,0 +1,1 @@
+# chicupon-supabase-prisma
