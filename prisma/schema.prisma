@@ -1,0 +1,250 @@
+datasource db {
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  directUrl         = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+
+model Category {
+  category_id Int      @id @default(autoincrement())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+}
+
+model Business {
+  business_id                      String   @id @default(uuid())
+  business_legal_name              String
+  business_rut                     String   @unique
+  business_display_name            String
+  business_email                   String   @unique
+  business_main_phone              String?
+  business_secondary_phone         String?
+  business_description             String?
+  legal_representative_firstname   String
+  legal_representative_lastname    String
+  legal_representative_rut         String
+  business_admin_profile_id        String   @unique
+  business_website                 String?
+  business_facebook                String?
+  business_instagram               String?
+  business_whatsapp                String?
+  business_logo                    String?
+  business_cover                   String?
+  created_at                       DateTime @default(now())
+  updated_at                       DateTime @updatedAt
+  subscription_id                  Int?
+  status_id                        Int
+  business_tiktok                  String?
+  is_featured                      Boolean  @default(false)
+  business_youtube                 String?
+  business_x                       String?
+
+  @@index([subscription_id])
+  @@index([status_id])
+  @@index([business_admin_profile_id])
+
+  @@foreignKey([subscription_id], references: [subscription_id], onUpdate: Cascade, onDelete: SetNull)
+  @@foreignKey([status_id], references: [status_id], onUpdate: Cascade)
+  @@foreignKey([business_admin_profile_id], references: [id], onUpdate: Cascade)
+}
+
+model BusinessBranch {
+  branch_id           String   @id @default(uuid())
+  branch_address      String
+  branch_commune      String
+  branch_city         String
+  branch_phone        String?
+  branch_latitude     Float?
+  branch_longitude    Float?
+  branch_address_type String
+  branch_created_by   String
+  created_at          DateTime @default(now())
+  updated_at          DateTime @updatedAt
+  business_id         String?
+
+  @@index([branch_created_by])
+  @@index([business_id])
+
+  @@foreignKey([branch_created_by], references: [id])
+  @@foreignKey([business_id], references: [business_id], onUpdate: Cascade, onDelete: Cascade)
+}
+
+model BusinessChangeComment {
+  business_change_comment_id String   @id @default(uuid())
+  business_change_id         String
+  comment                    String
+  author_role                String?
+  created_at                 DateTime @default(now())
+
+  @@index([business_change_id])
+
+  @@foreignKey([business_change_id], references: [business_change_id], onDelete: Cascade)
+}
+
+model BusinessChangeStatus {
+  business_change_status_id Int      @id @default(autoincrement())
+  status_name               String
+  created_at                DateTime @default(now())
+  updated_at                DateTime @updatedAt
+}
+
+model BusinessChange {
+  business_change_id               String   @id @default(uuid())
+  business_id                      String   @unique
+  business_legal_name              String?
+  business_rut                     String?  @unique
+  business_display_name            String?
+  business_description             String?
+  legal_representative_firstname   String?
+  legal_representative_lastname    String?
+  legal_representative_rut         String?
+  reviewer_id                      String?
+  change_status_id                 Int
+  created_at                       DateTime @default(now())
+  updated_at                       DateTime @updatedAt
+
+  @@index([change_status_id])
+  @@index([business_id])
+  @@index([business_rut])
+
+  @@foreignKey([change_status_id], references: [business_change_status_id], onUpdate: Cascade)
+  @@foreignKey([business_id], references: [business_id], onDelete: Cascade)
+}
+
+model BusinessComment {
+  business_comment_id String   @id @default(uuid())
+  business_id         String
+  comment             String
+  author_role         String
+  created_at          DateTime @default(now())
+
+  @@index([business_id])
+
+  @@foreignKey([business_id], references: [business_id], onDelete: Cascade)
+}
+
+model BusinessStatusLog {
+  status_log_id Int      @id @default(autoincrement())
+  status_id     Int
+  user_id       String
+  created_at    DateTime @default(now())
+
+  @@index([status_id])
+  @@index([user_id])
+
+  @@foreignKey([status_id], references: [status_id], onUpdate: Cascade)
+  @@foreignKey([user_id], references: [id])
+}
+
+model BusinessStatus {
+  status_id   Int    @id @default(autoincrement())
+  status      String
+  description String?
+}
+
+model CouponApproveStatus {
+  coupon_approve_status_id Int      @id @default(autoincrement())
+  status                   String
+  description              String?
+  created_at               DateTime @default(now())
+  updated_at               DateTime @updatedAt
+}
+
+model CouponComment {
+  coupon_comment_id String   @id @default(uuid())
+  comment           String
+  author_role       String?
+  created_at        DateTime @default(now())
+  coupon_id         String?
+
+  @@index([coupon_id])
+
+  @@foreignKey([coupon_id], references: [coupon_id], onUpdate: Cascade, onDelete: Cascade)
+}
+
+model CouponPublicationStatus {
+  coupon_publication_status_id Int      @id @default(autoincrement())
+  status                       String
+  description                  String?
+}
+
+model CouponRedeem {
+  coupon_redeem_id String   @id @default(uuid())
+  redeem_count     Int      @default(0)
+  request_count    Int      @default(0)
+  redeem_code      String   @unique
+  coupon_id        String?
+
+  @@index([coupon_id])
+
+  @@foreignKey([coupon_id], references: [coupon_id], onUpdate: Cascade, onDelete: SetNull)
+}
+
+model CouponStatus {
+  status_id   Int    @id @default(autoincrement())
+  status      String
+  description String?
+}
+
+model Coupon {
+  coupon_id              String   @id @default(uuid())
+  title                  String
+  promo_type             String?
+  discount_amount        Int?
+  discount_percentage    Int?
+  another_promo_type     String?
+  coupon_code            String?
+  conditions             String?
+  featured_image         String?
+  redemption_type        String
+  redemption_link        String?
+  redemption_addresses   Json     @default("[]")
+  max_redeems_per_promo  Int      @default(0)
+  max_redeems_per_user   Int      @default(1)
+  start_date             DateTime
+  end_date               DateTime
+  created_at             DateTime @default(now())
+  updated_at             DateTime @updatedAt
+  business_id            String
+  status_id              Int
+  categories             Int[]
+  is_featured            Boolean  @default(false)
+
+  @@index([business_id])
+  @@index([status_id])
+
+  @@foreignKey([business_id], references: [business_id], onDelete: Cascade)
+  @@foreignKey([status_id], references: [status_id], onUpdate: Cascade)
+}
+
+model Profile {
+  id         String @id @default(uuid())
+  firstname  String?
+  lastname   String?
+  email      String?
+  role       String?
+  birthday   String?
+  gender     String?
+  phone      String?
+  terms      String  @default("No")
+
+  @@foreignKey([id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+}
+
+model Subscription {
+  subscription_id Int      @id @default(autoincrement())
+  start_date      DateTime @default(now())
+  end_date        DateTime @default(now())
+  total_cost      Float
+  tax             Float?
+  discount        Float?
+  is_active       Boolean  @default(true)
+  plan_id         Int?
+}
