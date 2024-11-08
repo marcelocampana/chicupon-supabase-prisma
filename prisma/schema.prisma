@@ -267,7 +267,7 @@ model plan {
   is_active                  Boolean  @default(true) // Indica si el plan está activo en general
   is_available_for_subscription Boolean @default(true) // Indica si el plan se puede contratar actualmente
   created_at                 DateTime @default(now())
-  updated_at                 DateTime @updatedAt
+  updated_at                 DateTime @default(now())
 
   subscriptions subscription[]
 }
@@ -285,4 +285,14 @@ model subscription {
   plan            plan    @relation(fields: [plan_id], references: [plan_id], onUpdate: Cascade, onDelete: SetNull)
   business        business @relation("AllSubscriptions", fields: [business_id], references: [business_id], onUpdate: Cascade, onDelete: Cascade)
   currentSubscriptionBusiness business? @relation("CurrentSubscription")
+}
+
+model tax_iva {
+  tax_id      Int      @id @default(1)
+  rate        Float
+  description String?
+  created_at  DateTime @default(now())
+  updated_at  DateTime @default(now())
+
+  @@unique([tax_id])
 }
