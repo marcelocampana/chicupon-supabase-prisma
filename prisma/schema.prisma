@@ -29,7 +29,7 @@ model Business {
   legal_representative_firstname   String
   legal_representative_lastname    String
   legal_representative_rut         String
-  business_admin_profile_id        String   @unique // Mantener la relación pero con validaciones de aplicación para evitar nulos sin reasignar primero adminProfile Profile @relation(fields: [business_admin_profile_id], references: [id], onUpdate: Cascade)
+  business_admin_profile_id        String   @unique
   business_website                 String?
   business_facebook                String?
   business_instagram               String?
@@ -50,7 +50,7 @@ model Business {
   @@index([business_admin_profile_id])
 
   subscription Subscription? @relation("CurrentSubscription", fields: [subscription_id], references: [subscription_id])
-  status BusinessStatus @relation(fields: [status_id], references: [status_id], onUpdate: Cascade, onDelete: SetNull)
+  status BusinessStatus @relation(fields: [status_id], references: [status_id], onUpdate: Cascade) // Removido onDelete: SetNull
   adminProfile Profile @relation(fields: [business_admin_profile_id], references: [id], onUpdate: Cascade, onDelete: SetNull)
 
   branches BusinessBranch[]
