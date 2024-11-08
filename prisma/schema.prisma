@@ -2,10 +2,18 @@ datasource db {
   provider          = "postgresql"
   url               = env("DATABASE_URL")
   directUrl         = env("DIRECT_URL")
+   schemas           = ["public", "auth"]  
 }
 
 generator client {
   provider = "prisma-client-js"
+   previewFeatures = ["multiSchema"]
+}
+model User {
+  id     Int     @id
+  // ...
+
+  @@schema("auth") // or @@schema("public")
 }
 
 model category {
