@@ -1,15 +1,12 @@
 datasource db {
-  provider          = "postgresql"
-  url               = env("DATABASE_URL")
-  directUrl         = env("DIRECT_URL")
-
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 generator client {
   provider = "prisma-client-js"
 }
-
-
 
 model category {
   category_id Int      @id @default(autoincrement())
@@ -21,46 +18,46 @@ model category {
 }
 
 model business {
-  business_id                      String   @id @default(uuid())
-  business_legal_name              String
-  business_rut                     String   @unique
-  business_display_name            String
-  business_email                   String   @unique
-  business_main_phone              String
-  business_secondary_phone         String?
-  business_description             String?
-  legal_representative_firstname   String
-  legal_representative_lastname    String
-  legal_representative_rut         String
-  business_admin_profile_id        String   @unique
-  business_website                 String?
-  business_facebook                String?
-  business_instagram               String?
-  business_whatsapp                String?
-  business_logo                    String?
-  business_cover                   String?
-  created_at                       DateTime @default(now())
-  updated_at                       DateTime @updatedAt
-  subscription_id                  Int? @unique
-  status_id                        Int
-  business_tiktok                  String?
-  is_featured                      Boolean  @default(false)
-  business_youtube                 String?
-  business_x                       String?
+  business_id                    String   @id @default(uuid())
+  business_legal_name            String
+  business_rut                   String   @unique
+  business_display_name          String
+  business_email                 String   @unique
+  business_main_phone            String
+  business_secondary_phone       String?
+  business_description           String?
+  legal_representative_firstname String
+  legal_representative_lastname  String
+  legal_representative_rut       String
+  business_admin_profile_id      String   @unique
+  business_website               String?
+  business_facebook              String?
+  business_instagram             String?
+  business_whatsapp              String?
+  business_logo                  String?
+  business_cover                 String?
+  created_at                     DateTime @default(now())
+  updated_at                     DateTime @updatedAt
+  subscription_id                Int?     @unique
+  status_id                      Int
+  business_tiktok                String?
+  is_featured                    Boolean  @default(false)
+  business_youtube               String?
+  business_x                     String?
+
+  subscription subscription?   @relation("CurrentSubscription", fields: [subscription_id], references: [subscription_id])
+  status       business_status @relation(fields: [status_id], references: [status_id], onUpdate: Cascade) // Removido onDelete: SetNull
+  adminProfile profile         @relation(fields: [business_admin_profile_id], references: [id], onUpdate: Cascade, onDelete: Restrict)
+
+  branches      business_branch[]
+  changes       business_change[]
+  comments      business_comment[]
+  coupons       coupon[]
+  subscriptions subscription[]     @relation("AllSubscriptions")
 
   @@index([subscription_id])
   @@index([status_id])
   @@index([business_admin_profile_id])
-
-  subscription subscription? @relation("CurrentSubscription", fields: [subscription_id], references: [subscription_id])
-  status business_status @relation(fields: [status_id], references: [status_id], onUpdate: Cascade) // Removido onDelete: SetNull
-  adminProfile profile @relation(fields: [business_admin_profile_id], references: [id], onUpdate: Cascade, onDelete: Restrict)
-
-  branches business_branch[]
-  changes business_change[]
-  comments business_comment[]
-  coupons coupon[]
-  subscriptions subscription[] @relation("AllSubscriptions")
 }
 
 model business_branch {
@@ -77,11 +74,11 @@ model business_branch {
   updated_at          DateTime @updatedAt
   business_id         String
 
+  createdBy profile   @relation(fields: [branch_created_by], references: [id], onUpdate: Cascade, onDelete: Restrict)
+  business  business? @relation(fields: [business_id], references: [business_id], onUpdate: Cascade, onDelete: Cascade)
+
   @@index([branch_created_by])
   @@index([business_id])
-
-  createdBy profile @relation(fields: [branch_created_by], references: [id], onUpdate: Cascade, onDelete: Restrict)
-  business business? @relation(fields: [business_id], references: [business_id], onUpdate: Cascade, onDelete: Cascade)
 }
 
 model business_change_comment {
@@ -91,9 +88,9 @@ model business_change_comment {
   author_role                String
   created_at                 DateTime @default(now())
 
-  @@index([business_change_id])
-
   businessChange business_change @relation(fields: [business_change_id], references: [business_change_id], onDelete: Cascade)
+
+  @@index([business_change_id])
 }
 
 model business_change_status {
@@ -106,28 +103,28 @@ model business_change_status {
 }
 
 model business_change {
-  business_change_id               String   @id @default(uuid())
-  business_id                      String   @unique
-  business_legal_name              String
-  business_rut                     String  @unique
-  business_display_name            String
-  business_description             String?
-  legal_representative_firstname   String?
-  legal_representative_lastname    String?
-  legal_representative_rut         String?
-  reviewer_id                      String?
-  change_status_id                 Int
-  created_at                       DateTime @default(now())
-  updated_at                       DateTime @default(now())
+  business_change_id             String   @id @default(uuid())
+  business_id                    String   @unique
+  business_legal_name            String
+  business_rut                   String   @unique
+  business_display_name          String
+  business_description           String?
+  legal_representative_firstname String?
+  legal_representative_lastname  String?
+  legal_representative_rut       String?
+  reviewer_id                    String?
+  change_status_id               Int
+  created_at                     DateTime @default(now())
+  updated_at                     DateTime @default(now())
+
+  changeStatus business_change_status @relation(fields: [change_status_id], references: [business_change_status_id], onUpdate: Cascade, onDelete: Restrict)
+  business     business               @relation(fields: [business_id], references: [business_id], onUpdate: Cascade, onDelete: Cascade)
+
+  comments business_change_comment[]
 
   @@index([change_status_id])
   @@index([business_id])
   @@index([business_rut])
-
-  changeStatus business_change_status @relation(fields: [change_status_id], references: [business_change_status_id], onUpdate: Cascade, onDelete: Restrict)
-  business business @relation(fields: [business_id], references: [business_id], onUpdate: Cascade, onDelete: Cascade)
-
-  comments business_change_comment[]
 }
 
 model business_comment {
@@ -137,9 +134,9 @@ model business_comment {
   author_role         String
   created_at          DateTime @default(now())
 
-  @@index([business_id])
-
   business business @relation(fields: [business_id], references: [business_id], onUpdate: Cascade, onDelete: Cascade)
+
+  @@index([business_id])
 }
 
 model business_status_log {
@@ -148,15 +145,15 @@ model business_status_log {
   user_id       String
   created_at    DateTime @default(now())
 
+  status business_status @relation(fields: [status_id], references: [status_id], onUpdate: Cascade, onDelete: Restrict)
+  user   profile         @relation(fields: [user_id], references: [id], onUpdate: Cascade, onDelete: Restrict)
+
   @@index([status_id])
   @@index([user_id])
-
-  status business_status @relation(fields: [status_id], references: [status_id], onUpdate: Cascade, onDelete: Restrict)
-  user profile @relation(fields: [user_id], references: [id], onUpdate: Cascade, onDelete: Restrict)
 }
 
 model business_status {
-  status_id   Int    @id @default(autoincrement())
+  status_id   Int     @id @default(autoincrement())
   status      String
   description String?
 
@@ -179,31 +176,31 @@ model coupon_comment {
   created_at        DateTime @default(now())
   coupon_id         String
 
-  @@index([coupon_id])
-
   coupon coupon? @relation(fields: [coupon_id], references: [coupon_id], onUpdate: Cascade, onDelete: Cascade)
+
+  @@index([coupon_id])
 }
 
 model coupon_publication_status {
-  coupon_publication_status_id Int      @id @default(autoincrement())
+  coupon_publication_status_id Int     @id @default(autoincrement())
   status                       String
   description                  String?
 }
 
 model coupon_redeem {
-  coupon_redeem_id String   @id @default(uuid())
-  redeem_count     Int      @default(0)
-  request_count    Int      @default(0)
-  redeem_code      String   @unique
+  coupon_redeem_id String @id @default(uuid())
+  redeem_count     Int    @default(0)
+  request_count    Int    @default(0)
+  redeem_code      String @unique
   coupon_id        String
 
-  @@index([coupon_id])
-
   coupon coupon? @relation(fields: [coupon_id], references: [coupon_id], onUpdate: Cascade, onDelete: Restrict)
+
+  @@index([coupon_id])
 }
 
 model coupon_status {
-  status_id   Int    @id @default(autoincrement())
+  status_id   Int     @id @default(autoincrement())
   status      String
   description String?
 
@@ -211,67 +208,69 @@ model coupon_status {
 }
 
 model coupon {
-  coupon_id              String   @id @default(uuid())
-  title                  String
-  promo_type             String
-  discount_amount        Int?
-  discount_percentage    Int?
-  another_promo_type     String?
-  coupon_code            String?
-  conditions             String?
-  featured_image         String?
-  redemption_type        String
-  redemption_link        String?
-  redemption_addresses   Json     @default("[]")
-  max_redeems_per_promo  Int      @default(0)
-  max_redeems_per_user   Int      @default(1)
-  start_date             DateTime
-  end_date               DateTime
-  created_at             DateTime @default(now())
-  updated_at             DateTime @default(now())
-  business_id            String
-  status_id              Int
-  categories             Int[]
-  is_featured            Boolean  @default(false)
+  coupon_id             String   @id @default(uuid())
+  title                 String
+  promo_type            String
+  discount_amount       Int?
+  discount_percentage   Int?
+  another_promo_type    String?
+  coupon_code           String?
+  conditions            String?
+  featured_image        String?
+  redemption_type       String
+  redemption_link       String?
+  redemption_addresses  Json     @default("[]")
+  max_redeems_per_promo Int      @default(0)
+  max_redeems_per_user  Int      @default(1)
+  start_date            DateTime
+  end_date              DateTime
+  created_at            DateTime @default(now())
+  updated_at            DateTime @default(now())
+  business_id           String
+  status_id             Int
+  categories            Int[]
+  is_featured           Boolean  @default(false)
+
+  business business      @relation(fields: [business_id], references: [business_id], onUpdate: Cascade, onDelete: Cascade)
+  status   coupon_status @relation(fields: [status_id], references: [status_id], onUpdate: Cascade, onDelete: Restrict)
+
+  comments coupon_comment[]
+  redeems  coupon_redeem[]
 
   @@index([business_id])
   @@index([status_id])
-
-  business business @relation(fields: [business_id], references: [business_id], onUpdate: Cascade, onDelete: Cascade)
-  status coupon_status @relation(fields: [status_id], references: [status_id], onUpdate: Cascade, onDelete: Restrict)
-
-  comments coupon_comment[]
-  redeems coupon_redeem[]
 }
 
 model profile {
-  id                    String  @id @default(uuid())
-  userId                String  @unique @default(uuid())
+  id                     String  @id @default(uuid())
+  userId                 String  @unique @default(uuid())
   firstname              String
-  lastname              String
-  email                 String
-  role                  String
-  birthday              String?
-  gender                String?
-  phone                 String?
-  terms                 String  @default("No")
-  is_active             Boolean @default(true)
+  lastname               String
+  email                  String
+  role_id                Int
+  birthday               String?
+  gender                 String?
+  phone                  String?
+  terms                  String  @default("No")
+  is_active              Boolean @default(true)
   has_access_to_business Boolean @default(true) // Nuevo campo para indicar si tiene acceso a algún comercio
 
   businesses business[]
-  branches business_branch[]
+  branches   business_branch[]
   statusLogs business_status_log[]
+
+  role role @relation(fields: [role_id], references: [role_id], onUpdate: Cascade, onDelete: Restrict)
 }
 
 model plan {
-  plan_id                    Int      @id @default(autoincrement())
-  name                       String   @unique
-  description                String?
-  cost                       Float
-  is_active                  Boolean  @default(true) // Indica si el plan está activo en general
-  is_available_for_subscription Boolean @default(true) // Indica si el plan se puede contratar actualmente
-  created_at                 DateTime @default(now())
-  updated_at                 DateTime @default(now())
+  plan_id                       Int      @id @default(autoincrement())
+  name                          String   @unique
+  description                   String?
+  cost                          Float
+  is_active                     Boolean  @default(true) // Indica si el plan está activo en general
+  is_available_for_subscription Boolean  @default(true) // Indica si el plan se puede contratar actualmente
+  created_at                    DateTime @default(now())
+  updated_at                    DateTime @default(now())
 
   subscriptions subscription[]
 }
@@ -286,8 +285,8 @@ model subscription {
   plan_id         Int
   business_id     String
 
-  plan            plan    @relation(fields: [plan_id], references: [plan_id], onUpdate: Cascade, onDelete: Restrict)
-  business        business @relation("AllSubscriptions", fields: [business_id], references: [business_id], onUpdate: Cascade, onDelete: Cascade)
+  plan                        plan      @relation(fields: [plan_id], references: [plan_id], onUpdate: Cascade, onDelete: Restrict)
+  business                    business  @relation("AllSubscriptions", fields: [business_id], references: [business_id], onUpdate: Cascade, onDelete: Cascade)
   currentSubscriptionBusiness business? @relation("CurrentSubscription")
 }
 
@@ -299,4 +298,14 @@ model tax_iva {
   updated_at  DateTime @default(now())
 
   @@unique([tax_id])
+}
+
+model role {
+  role_id     Int       @id @default(autoincrement())
+  role_name   String    @unique
+  description String?
+  profiles    profile[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
 }
