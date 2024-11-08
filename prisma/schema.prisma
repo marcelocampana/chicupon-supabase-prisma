@@ -8,7 +8,7 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model Category {
+model category {
   category_id Int      @id @default(autoincrement())
   name        String   @unique
   slug        String   @unique
@@ -17,7 +17,7 @@ model Category {
   updated_at  DateTime @updatedAt
 }
 
-model Business {
+model business {
   business_id                      String   @id @default(uuid())
   business_legal_name              String
   business_rut                     String   @unique
@@ -49,18 +49,18 @@ model Business {
   @@index([status_id])
   @@index([business_admin_profile_id])
 
-  subscription Subscription? @relation("CurrentSubscription", fields: [subscription_id], references: [subscription_id])
-  status BusinessStatus @relation(fields: [status_id], references: [status_id], onUpdate: Cascade) // Removido onDelete: SetNull
-  adminProfile Profile @relation(fields: [business_admin_profile_id], references: [id], onUpdate: Cascade, onDelete: SetNull)
+  subscription subscription? @relation("CurrentSubscription", fields: [subscription_id], references: [subscription_id])
+  status business_status @relation(fields: [status_id], references: [status_id], onUpdate: Cascade) // Removido onDelete: SetNull
+  adminProfile profile @relation(fields: [business_admin_profile_id], references: [id], onUpdate: Cascade, onDelete: SetNull)
 
-  branches BusinessBranch[]
-  changes BusinessChange[]
-  comments BusinessComment[]
-  coupons Coupon[]
-  subscriptions Subscription[] @relation("AllSubscriptions")
+  branches business_branch[]
+  changes business_change[]
+  comments business_comment[]
+  coupons coupon[]
+  subscriptions subscription[] @relation("AllSubscriptions")
 }
 
-model BusinessBranch {
+model business_branch {
   branch_id           String   @id @default(uuid())
   branch_address      String
   branch_commune      String
@@ -77,11 +77,11 @@ model BusinessBranch {
   @@index([branch_created_by])
   @@index([business_id])
 
-  createdBy Profile @relation(fields: [branch_created_by], references: [id], onUpdate: Cascade, onDelete: SetNull)
-  business Business? @relation(fields: [business_id], references: [business_id], onUpdate: Cascade, onDelete: Cascade)
+  createdBy profile @relation(fields: [branch_created_by], references: [id], onUpdate: Cascade, onDelete: SetNull)
+  business business? @relation(fields: [business_id], references: [business_id], onUpdate: Cascade, onDelete: Cascade)
 }
 
-model BusinessChangeComment {
+model business_change_comment {
   business_change_comment_id String   @id @default(uuid())
   business_change_id         String
   comment                    String
@@ -90,19 +90,19 @@ model BusinessChangeComment {
 
   @@index([business_change_id])
 
-  businessChange BusinessChange @relation(fields: [business_change_id], references: [business_change_id], onDelete: Cascade)
+  businessChange business_change @relation(fields: [business_change_id], references: [business_change_id], onDelete: Cascade)
 }
 
-model BusinessChangeStatus {
+model business_change_status {
   business_change_status_id Int      @id @default(autoincrement())
   status_name               String
   created_at                DateTime @default(now())
   updated_at                DateTime @updatedAt
 
-  changes BusinessChange[]
+  changes business_change[]
 }
 
-model BusinessChange {
+model business_change {
   business_change_id               String   @id @default(uuid())
   business_id                      String   @unique
   business_legal_name              String?
@@ -121,13 +121,13 @@ model BusinessChange {
   @@index([business_id])
   @@index([business_rut])
 
-  changeStatus BusinessChangeStatus @relation(fields: [change_status_id], references: [business_change_status_id], onUpdate: Cascade, onDelete: SetNull)
-  business Business @relation(fields: [business_id], references: [business_id], onUpdate: Cascade, onDelete: Cascade)
+  changeStatus business_change_status @relation(fields: [change_status_id], references: [business_change_status_id], onUpdate: Cascade, onDelete: SetNull)
+  business business @relation(fields: [business_id], references: [business_id], onUpdate: Cascade, onDelete: Cascade)
 
-  comments BusinessChangeComment[]
+  comments business_change_comment[]
 }
 
-model BusinessComment {
+model business_comment {
   business_comment_id String   @id @default(uuid())
   business_id         String
   comment             String
@@ -136,10 +136,10 @@ model BusinessComment {
 
   @@index([business_id])
 
-  business Business @relation(fields: [business_id], references: [business_id], onUpdate: Cascade, onDelete: Cascade)
+  business business @relation(fields: [business_id], references: [business_id], onUpdate: Cascade, onDelete: Cascade)
 }
 
-model BusinessStatusLog {
+model business_status_log {
   status_log_id Int      @id @default(autoincrement())
   status_id     Int
   user_id       String
@@ -148,20 +148,20 @@ model BusinessStatusLog {
   @@index([status_id])
   @@index([user_id])
 
-  status BusinessStatus @relation(fields: [status_id], references: [status_id], onUpdate: Cascade, onDelete: SetNull)
-  user Profile @relation(fields: [user_id], references: [id], onUpdate: Cascade, onDelete: SetNull)
+  status business_status @relation(fields: [status_id], references: [status_id], onUpdate: Cascade, onDelete: SetNull)
+  user profile @relation(fields: [user_id], references: [id], onUpdate: Cascade, onDelete: SetNull)
 }
 
-model BusinessStatus {
+model business_status {
   status_id   Int    @id @default(autoincrement())
   status      String
   description String?
 
-  businesses Business[]
-  statusLogs BusinessStatusLog[]
+  businesses business[]
+  statusLogs business_status_log[]
 }
 
-model CouponApproveStatus {
+model coupon_approve_status {
   coupon_approve_status_id Int      @id @default(autoincrement())
   status                   String
   description              String?
@@ -169,7 +169,7 @@ model CouponApproveStatus {
   updated_at               DateTime @updatedAt
 }
 
-model CouponComment {
+model coupon_comment {
   coupon_comment_id String   @id @default(uuid())
   comment           String
   author_role       String?
@@ -178,16 +178,16 @@ model CouponComment {
 
   @@index([coupon_id])
 
-  coupon Coupon? @relation(fields: [coupon_id], references: [coupon_id], onUpdate: Cascade, onDelete: Cascade)
+  coupon coupon? @relation(fields: [coupon_id], references: [coupon_id], onUpdate: Cascade, onDelete: Cascade)
 }
 
-model CouponPublicationStatus {
+model coupon_publication_status {
   coupon_publication_status_id Int      @id @default(autoincrement())
   status                       String
   description                  String?
 }
 
-model CouponRedeem {
+model coupon_redeem {
   coupon_redeem_id String   @id @default(uuid())
   redeem_count     Int      @default(0)
   request_count    Int      @default(0)
@@ -196,18 +196,18 @@ model CouponRedeem {
 
   @@index([coupon_id])
 
-  coupon Coupon? @relation(fields: [coupon_id], references: [coupon_id], onUpdate: Cascade, onDelete: SetNull)
+  coupon coupon? @relation(fields: [coupon_id], references: [coupon_id], onUpdate: Cascade, onDelete: SetNull)
 }
 
-model CouponStatus {
+model coupon_status {
   status_id   Int    @id @default(autoincrement())
   status      String
   description String?
 
-  coupons Coupon[] // Relación inversa que apunta a los cupones asociados con este estado.
+  coupons coupon[] // Relación inversa que apunta a los cupones asociados con este estado.
 }
 
-model Coupon {
+model coupon {
   coupon_id              String   @id @default(uuid())
   title                  String
   promo_type             String?
@@ -234,14 +234,14 @@ model Coupon {
   @@index([business_id])
   @@index([status_id])
 
-  business Business @relation(fields: [business_id], references: [business_id], onUpdate: Cascade, onDelete: Cascade)
-  status CouponStatus @relation(fields: [status_id], references: [status_id], onUpdate: Cascade, onDelete: SetNull)
+  business business @relation(fields: [business_id], references: [business_id], onUpdate: Cascade, onDelete: Cascade)
+  status coupon_status @relation(fields: [status_id], references: [status_id], onUpdate: Cascade, onDelete: SetNull)
 
-  comments CouponComment[]
-  redeems CouponRedeem[]
+  comments coupon_comment[]
+  redeems coupon_redeem[]
 }
 
-model Profile {
+model profile {
   id                    String  @id @default(uuid())
   firstname             String?
   lastname              String?
@@ -254,12 +254,12 @@ model Profile {
   is_active             Boolean @default(true)
   has_access_to_business Boolean @default(true) // Nuevo campo para indicar si tiene acceso a algún comercio
 
-  businesses Business[]
-  branches BusinessBranch[]
-  statusLogs BusinessStatusLog[]
+  businesses business[]
+  branches business_branch[]
+  statusLogs business_status_log[]
 }
 
-model Plan {
+model plan {
   plan_id                    Int      @id @default(autoincrement())
   name                       String   @unique
   description                String?
@@ -269,10 +269,10 @@ model Plan {
   created_at                 DateTime @default(now())
   updated_at                 DateTime @updatedAt
 
-  subscriptions Subscription[]
+  subscriptions subscription[]
 }
 
-model Subscription {
+model subscription {
   subscription_id Int      @id @default(autoincrement())
   start_date      DateTime @default(now())
   end_date        DateTime @default(now())
@@ -283,7 +283,7 @@ model Subscription {
   plan_id         Int
   business_id     String
 
-  plan            Plan    @relation(fields: [plan_id], references: [plan_id], onUpdate: Cascade, onDelete: SetNull)
-  business        Business @relation("AllSubscriptions", fields: [business_id], references: [business_id], onUpdate: Cascade, onDelete: Cascade)
-  currentSubscriptionBusiness Business? @relation("CurrentSubscription")
+  plan            plan    @relation(fields: [plan_id], references: [plan_id], onUpdate: Cascade, onDelete: SetNull)
+  business        business @relation("AllSubscriptions", fields: [business_id], references: [business_id], onUpdate: Cascade, onDelete: Cascade)
+  currentSubscriptionBusiness business? @relation("CurrentSubscription")
 }
