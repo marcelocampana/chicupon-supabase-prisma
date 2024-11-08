@@ -23,6 +23,8 @@ model category {
   description String?
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
+
+  @@schema("public")
 }
 
 model business {
@@ -66,6 +68,8 @@ model business {
   comments business_comment[]
   coupons coupon[]
   subscriptions subscription[] @relation("AllSubscriptions")
+
+  @@schema("public")
 }
 
 model business_branch {
@@ -87,6 +91,8 @@ model business_branch {
 
   createdBy profile @relation(fields: [branch_created_by], references: [id], onUpdate: Cascade, onDelete: Restrict)
   business business? @relation(fields: [business_id], references: [business_id], onUpdate: Cascade, onDelete: Cascade)
+
+  @@schema("public")
 }
 
 model business_change_comment {
@@ -99,6 +105,8 @@ model business_change_comment {
   @@index([business_change_id])
 
   businessChange business_change @relation(fields: [business_change_id], references: [business_change_id], onDelete: Cascade)
+
+  @@schema("public")
 }
 
 model business_change_status {
@@ -108,6 +116,8 @@ model business_change_status {
   updated_at                DateTime @updatedAt
 
   changes business_change[]
+
+  @@schema("public")
 }
 
 model business_change {
@@ -123,7 +133,7 @@ model business_change {
   reviewer_id                      String?
   change_status_id                 Int
   created_at                       DateTime @default(now())
-  updated_at                       DateTime @updatedAt
+  updated_at                       DateTime @default(now())
 
   @@index([change_status_id])
   @@index([business_id])
@@ -133,6 +143,8 @@ model business_change {
   business business @relation(fields: [business_id], references: [business_id], onUpdate: Cascade, onDelete: Cascade)
 
   comments business_change_comment[]
+
+  @@schema("public")
 }
 
 model business_comment {
@@ -145,6 +157,8 @@ model business_comment {
   @@index([business_id])
 
   business business @relation(fields: [business_id], references: [business_id], onUpdate: Cascade, onDelete: Cascade)
+
+  @@schema("public")
 }
 
 model business_status_log {
@@ -158,6 +172,8 @@ model business_status_log {
 
   status business_status @relation(fields: [status_id], references: [status_id], onUpdate: Cascade, onDelete: Restrict)
   user profile @relation(fields: [user_id], references: [id], onUpdate: Cascade, onDelete: Restrict)
+
+  @@schema("public")
 }
 
 model business_status {
@@ -167,6 +183,8 @@ model business_status {
 
   businesses business[]
   statusLogs business_status_log[]
+
+  @@schema("public")
 }
 
 model coupon_approve_status {
@@ -175,6 +193,8 @@ model coupon_approve_status {
   description              String?
   created_at               DateTime @default(now())
   updated_at               DateTime @updatedAt
+
+  @@schema("public")
 }
 
 model coupon_comment {
@@ -187,12 +207,16 @@ model coupon_comment {
   @@index([coupon_id])
 
   coupon coupon? @relation(fields: [coupon_id], references: [coupon_id], onUpdate: Cascade, onDelete: Cascade)
+
+  @@schema("public")
 }
 
 model coupon_publication_status {
   coupon_publication_status_id Int      @id @default(autoincrement())
   status                       String
   description                  String?
+
+  @@schema("public")
 }
 
 model coupon_redeem {
@@ -205,6 +229,8 @@ model coupon_redeem {
   @@index([coupon_id])
 
   coupon coupon? @relation(fields: [coupon_id], references: [coupon_id], onUpdate: Cascade, onDelete: Restrict)
+
+  @@schema("public")
 }
 
 model coupon_status {
@@ -213,6 +239,8 @@ model coupon_status {
   description String?
 
   coupons coupon[] // Relación inversa que apunta a los cupones asociados con este estado.
+
+  @@schema("public")
 }
 
 model coupon {
@@ -233,7 +261,7 @@ model coupon {
   start_date             DateTime
   end_date               DateTime
   created_at             DateTime @default(now())
-  updated_at             DateTime @updatedAt
+  updated_at             DateTime @default(now())
   business_id            String
   status_id              Int
   categories             Int[]
@@ -247,6 +275,8 @@ model coupon {
 
   comments coupon_comment[]
   redeems coupon_redeem[]
+
+  @@schema("public")
 }
 
 model profile {
@@ -265,6 +295,8 @@ model profile {
   businesses business[]
   branches business_branch[]
   statusLogs business_status_log[]
+
+  @@schema("public")
 }
 
 model plan {
@@ -278,6 +310,8 @@ model plan {
   updated_at                 DateTime @default(now())
 
   subscriptions subscription[]
+
+  @@schema("public")
 }
 
 model subscription {
@@ -293,6 +327,8 @@ model subscription {
   plan            plan    @relation(fields: [plan_id], references: [plan_id], onUpdate: Cascade, onDelete: Restrict)
   business        business @relation("AllSubscriptions", fields: [business_id], references: [business_id], onUpdate: Cascade, onDelete: Cascade)
   currentSubscriptionBusiness business? @relation("CurrentSubscription")
+
+  @@schema("public")
 }
 
 model tax_iva {
@@ -303,4 +339,6 @@ model tax_iva {
   updated_at  DateTime @default(now())
 
   @@unique([tax_id])
+
+  @@schema("public")
 }
