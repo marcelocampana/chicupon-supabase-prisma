@@ -23,7 +23,7 @@ model business {
   business_rut                     String   @unique
   business_display_name            String
   business_email                   String   @unique
-  business_main_phone              String?
+  business_main_phone              String
   business_secondary_phone         String?
   business_description             String?
   legal_representative_firstname   String
@@ -72,7 +72,7 @@ model business_branch {
   branch_created_by   String
   created_at          DateTime @default(now())
   updated_at          DateTime @updatedAt
-  business_id         String?
+  business_id         String
 
   @@index([branch_created_by])
   @@index([business_id])
@@ -85,7 +85,7 @@ model business_change_comment {
   business_change_comment_id String   @id @default(uuid())
   business_change_id         String
   comment                    String
-  author_role                String?
+  author_role                String
   created_at                 DateTime @default(now())
 
   @@index([business_change_id])
@@ -105,9 +105,9 @@ model business_change_status {
 model business_change {
   business_change_id               String   @id @default(uuid())
   business_id                      String   @unique
-  business_legal_name              String?
-  business_rut                     String?  @unique
-  business_display_name            String?
+  business_legal_name              String
+  business_rut                     String  @unique
+  business_display_name            String
   business_description             String?
   legal_representative_firstname   String?
   legal_representative_lastname    String?
@@ -172,9 +172,9 @@ model coupon_approve_status {
 model coupon_comment {
   coupon_comment_id String   @id @default(uuid())
   comment           String
-  author_role       String?
+  author_role       String
   created_at        DateTime @default(now())
-  coupon_id         String?
+  coupon_id         String
 
   @@index([coupon_id])
 
@@ -192,7 +192,7 @@ model coupon_redeem {
   redeem_count     Int      @default(0)
   request_count    Int      @default(0)
   redeem_code      String   @unique
-  coupon_id        String?
+  coupon_id        String
 
   @@index([coupon_id])
 
@@ -210,7 +210,7 @@ model coupon_status {
 model coupon {
   coupon_id              String   @id @default(uuid())
   title                  String
-  promo_type             String?
+  promo_type             String
   discount_amount        Int?
   discount_percentage    Int?
   another_promo_type     String?
@@ -243,10 +243,10 @@ model coupon {
 
 model profile {
   id                    String  @id @default(uuid())
-  firstname             String?
-  lastname              String?
-  email                 String?
-  role                  String?
+  firstname             String
+  lastname              String
+  email                 String
+  role                  String
   birthday              String?
   gender                String?
   phone                 String?
@@ -277,7 +277,6 @@ model subscription {
   start_date      DateTime @default(now())
   end_date        DateTime @default(now())
   total_cost      Float
-  tax             Float?
   discount        Float?
   is_active       Boolean  @default(true) // Indica si la suscripción está activa
   plan_id         Int
