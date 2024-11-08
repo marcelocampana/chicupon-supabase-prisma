@@ -51,7 +51,7 @@ model business {
 
   subscription subscription? @relation("CurrentSubscription", fields: [subscription_id], references: [subscription_id])
   status business_status @relation(fields: [status_id], references: [status_id], onUpdate: Cascade) // Removido onDelete: SetNull
-  adminProfile profile @relation(fields: [business_admin_profile_id], references: [id], onUpdate: Cascade, onDelete: SetNull)
+  adminProfile profile @relation(fields: [business_admin_profile_id], references: [id], onUpdate: Cascade, onDelete: Restrict)
 
   branches business_branch[]
   changes business_change[]
@@ -77,7 +77,7 @@ model business_branch {
   @@index([branch_created_by])
   @@index([business_id])
 
-  createdBy profile @relation(fields: [branch_created_by], references: [id], onUpdate: Cascade, onDelete: SetNull)
+  createdBy profile @relation(fields: [branch_created_by], references: [id], onUpdate: Cascade, onDelete: Restrict)
   business business? @relation(fields: [business_id], references: [business_id], onUpdate: Cascade, onDelete: Cascade)
 }
 
@@ -121,7 +121,7 @@ model business_change {
   @@index([business_id])
   @@index([business_rut])
 
-  changeStatus business_change_status @relation(fields: [change_status_id], references: [business_change_status_id], onUpdate: Cascade, onDelete: SetNull)
+  changeStatus business_change_status @relation(fields: [change_status_id], references: [business_change_status_id], onUpdate: Cascade, onDelete: Restrict)
   business business @relation(fields: [business_id], references: [business_id], onUpdate: Cascade, onDelete: Cascade)
 
   comments business_change_comment[]
@@ -148,8 +148,8 @@ model business_status_log {
   @@index([status_id])
   @@index([user_id])
 
-  status business_status @relation(fields: [status_id], references: [status_id], onUpdate: Cascade, onDelete: SetNull)
-  user profile @relation(fields: [user_id], references: [id], onUpdate: Cascade, onDelete: SetNull)
+  status business_status @relation(fields: [status_id], references: [status_id], onUpdate: Cascade, onDelete: Restrict)
+  user profile @relation(fields: [user_id], references: [id], onUpdate: Cascade, onDelete: Restrict)
 }
 
 model business_status {
@@ -196,7 +196,7 @@ model coupon_redeem {
 
   @@index([coupon_id])
 
-  coupon coupon? @relation(fields: [coupon_id], references: [coupon_id], onUpdate: Cascade, onDelete: SetNull)
+  coupon coupon? @relation(fields: [coupon_id], references: [coupon_id], onUpdate: Cascade, onDelete: Restrict)
 }
 
 model coupon_status {
@@ -235,7 +235,7 @@ model coupon {
   @@index([status_id])
 
   business business @relation(fields: [business_id], references: [business_id], onUpdate: Cascade, onDelete: Cascade)
-  status coupon_status @relation(fields: [status_id], references: [status_id], onUpdate: Cascade, onDelete: SetNull)
+  status coupon_status @relation(fields: [status_id], references: [status_id], onUpdate: Cascade, onDelete: Restrict)
 
   comments coupon_comment[]
   redeems coupon_redeem[]
@@ -282,7 +282,7 @@ model subscription {
   plan_id         Int
   business_id     String
 
-  plan            plan    @relation(fields: [plan_id], references: [plan_id], onUpdate: Cascade, onDelete: SetNull)
+  plan            plan    @relation(fields: [plan_id], references: [plan_id], onUpdate: Cascade, onDelete: Restrict)
   business        business @relation("AllSubscriptions", fields: [business_id], references: [business_id], onUpdate: Cascade, onDelete: Cascade)
   currentSubscriptionBusiness business? @relation("CurrentSubscription")
 }
